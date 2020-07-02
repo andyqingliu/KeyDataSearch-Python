@@ -84,8 +84,9 @@ class ExcelHandler(object):
         #         print("列名：", col, "列的值：", values)
         #     print("************************")
 
-        df = pd.DataFrame(self.colValuesDict)
-        df.to_excel("output.xlsx", index=False, columns=moduleColumns)
+        if len(self.colValuesDict) > 0:
+            df = pd.DataFrame(self.colValuesDict)
+            df.to_excel("output.xlsx", index=False, columns=moduleColumns)
 
     # 通过某个值获取DataFrame中该值对应的行列数组
     def GetIndexes(self, dfObj, value):

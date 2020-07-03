@@ -1,19 +1,21 @@
 import pandas as pd
 import os
 import re
+from Utils import logger
 
 excelNameKey = '立项申请表'
 moduleColumns = ['文件路径' ,'项目名称', '最终用户', '签约甲方', '商务路线', '项目说明', '申请人（销售）', 
 '申请人所属部门', '申请日期', '项目预算', '投标保证金', '联系电话', '投标方式', '投标时间', '付款方式']
 
-class ExcelHandler(object):
+class DataHandler(object):
     def __init__(self):
-        super(ExcelHandler,self).__init__()
+        super(DataHandler,self).__init__()
         # 明细数据，原始数据
         self.resData = None
 
         self.files = {}
         self.excelDict = {}
+        self.keyWords = []
         self.colValuesDict = {}
 
     def ReadFileFolder(self, fileFolderPath):
@@ -38,13 +40,14 @@ class ExcelHandler(object):
         if(len(fPath) > 0):
             return pd.read_excel(fPath)
 
-    def SearchContentFromFiles(self):
-        if len(moduleColumns) > 0 and len(self.excelDict) > 0:
+    def SearchContentFromFiles(self, keys):
+        self.InitKeyArray(keys)
+        if len(self.keyWords) > 0 and len(self.excelDict) > 0:
             for key in self.excelDict.keys():
 
                 value = self.excelDict[key]
                 # print(value.columns)
-                for col in moduleColumns:
+                for col in self.keyWords:
                     listofPos = self.GetIndexes(value, col)
                     finalValue = ""
                     if len(listofPos) > 0:
@@ -52,41 +55,61 @@ class ExcelHandler(object):
                         colIndex = listofPos[0][1]
                         finalValue = value.iloc[rowIndex, colIndex + 1]
                     else:
-                        if col != "文件路径":
-                            print("在文件 ", key, " 没找到的列名：", col)
+                        if not self.IsForcedCol(col):
+                            logger.warning("在文件%s 没找到的列名%d", key, col)
 
                     if self.colValuesDict.get(col) == None:
-                        print("列名为空，要初始化，列名是：", key, col)
+                        # print("列名为空，要初始化，列名是：", key, col)
                         colValues = list()
-                        if col == "文件路径":
+                        if self.IsForcedCol(col):
                             finalValue = key
 
                         colValues.append(finalValue)
                         self.colValuesDict[col] = colValues
                     else:
-                        if col == "文件路径":
+                        if self.IsForcedCol(col):
                             finalValue = key
                         self.colValuesDict[col].append(finalValue)
 
+    def InitKeyArray(self, keys):
+        self.keyWords.append('文件路径')
+        keyArray = keys.split('#')
+        # 强制带上路径信息
+        for key in keyArray:
+            keyStr = self.GetRemovedSpaceStr(key)
+            if keyStr != '':
+                logger.info("需要抓取关键字：%s", keyStr)
+                self.keyWords.append(keyStr)
+
+    def IsForcedCol(self, colStr):
+        return colStr == '文件路径'
+
+    def GetRemovedSpaceStr(self, strParam):
+        if isinstance(strParam, str):
+            pattern = re.compile(r'\s+')
+            return re.sub(pattern, '', strParam)
+        return ''
+
     def MatchRemoveSpace(self, x, value):
         if isinstance(x, str):
-            pattern = re.compile(r'\s+')
+            tempX = self.GetRemovedSpaceStr(x)
             # 通过正则表达式匹配去除文本里面的空格，提高模糊匹配能力(不能简单只去除首尾空格)
             # x = x.strip()
-            x = re.sub(pattern, '', x)
-            return value in x
+            return value in tempX
         else:
             return False
 
-    def BuildDataFrame(self):
+    def BuildDataFrame(self, outputFolderPath):
         # for col, colValues in self.colValuesDict.items():
         #     for values in colValues:
         #         print("列名：", col, "列的值：", values)
         #     print("************************")
 
+        logger.info("BuildDataFrame %d", len(self.colValuesDict))
         if len(self.colValuesDict) > 0:
             df = pd.DataFrame(self.colValuesDict)
-            df.to_excel("output.xlsx", index=False, columns=moduleColumns)
+            outputPath = os.path.join(outputFolderPath, "output.xlsx")
+            df.to_excel(outputPath, index=False, columns=self.keyWords)
 
     # 通过某个值获取DataFrame中该值对应的行列数组
     def GetIndexes(self, dfObj, value):

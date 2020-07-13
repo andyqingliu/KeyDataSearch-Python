@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>632</width>
-    <height>379</height>
+    <width>654</width>
+    <height>392</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,8 +17,8 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>110</y>
-     <width>131</width>
+     <y>130</y>
+     <width>201</width>
      <height>23</height>
     </rect>
    </property>
@@ -33,9 +33,9 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>180</y>
-     <width>151</width>
-     <height>51</height>
+     <y>200</y>
+     <width>201</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="sizeIncrement">
@@ -66,8 +66,8 @@
   <widget class="QPushButton" name="go">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>300</y>
+     <x>410</x>
+     <y>320</y>
      <width>75</width>
      <height>51</height>
     </rect>
@@ -86,8 +86,8 @@
   <widget class="QLineEdit" name="lineEdit_outPutPath">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>110</y>
+     <x>300</x>
+     <y>130</y>
      <width>331</width>
      <height>20</height>
     </rect>
@@ -96,8 +96,8 @@
   <widget class="QLineEdit" name="lineEdit_resPath">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>50</y>
+     <x>300</x>
+     <y>70</y>
      <width>331</width>
      <height>20</height>
     </rect>
@@ -107,8 +107,8 @@
    <property name="geometry">
     <rect>
      <x>70</x>
-     <y>50</y>
-     <width>131</width>
+     <y>70</y>
+     <width>201</width>
      <height>23</height>
     </rect>
    </property>
@@ -119,10 +119,63 @@
   <widget class="QTextEdit" name="textEdit_keys">
    <property name="geometry">
     <rect>
-     <x>230</x>
-     <y>170</y>
+     <x>300</x>
+     <y>190</y>
      <width>331</width>
      <height>101</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>宋体</family>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>10</y>
+     <width>211</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="sizeIncrement">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::LeftToRight</enum>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="lineWidth">
+    <number>0</number>
+   </property>
+   <property name="text">
+    <string>需要遍历的文件名的关键字(以#号隔开)</string>
+   </property>
+   <property name="scaledContents">
+    <bool>false</bool>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit_inputFileKeys">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>20</y>
+     <width>331</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">

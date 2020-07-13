@@ -2,10 +2,21 @@ import pandas as pd
 import os
 import re
 from Utils import logger
+from enum import Enum
 
 excelNameKey = '立项申请表'
 moduleColumns = ['文件路径' ,'项目名称', '最终用户', '签约甲方', '商务路线', '项目说明', '申请人（销售）', 
 '申请人所属部门', '申请日期', '项目预算', '投标保证金', '联系电话', '投标方式', '投标时间', '付款方式']
+
+enum_key_error_text = {
+    1 : '请填写要抓取的关键字',
+    2 : '有重复的关键字，分别是：{}'
+}
+
+class key_error(Enum):
+    success = 0
+    no_keys = 1
+    duplicate_keys = 2
 
 class DataHandler(object):
     def __init__(self):
@@ -16,7 +27,19 @@ class DataHandler(object):
         self.files = {}
         self.excelDict = {}
         self.keyWords = []
+        # 需要抓取的文件名的关键字
+        self.fileNameKeys = []
         self.colValuesDict = {}
+
+    def InitFileKeysArray(self, fileKeys):
+        if(len(fileKeys) > 0):
+            fileKeysArray = fileKeys.split('#')
+            # 强制带上路径信息
+            for key in fileKeysArray:
+                keyStr = self.GetRemovedSpaceStr(key)
+                if keyStr != '':
+                    logger.info("需要抓取文件名的关键字：%s", keyStr)
+                    self.fileNameKeys.append(keyStr)
 
     def ReadFileFolder(self, fileFolderPath):
         if(len(fileFolderPath) > 0):
@@ -26,7 +49,7 @@ class DataHandler(object):
                     absPath = os.path.join(root, filePath)
                     path, fileName = os.path.split(absPath)
                     # fullPath, ext = os.path.splitext(absPath)
-                    if excelNameKey in fileName:
+                    if self.IsValidFile(fileName):
                         curExcel = self.ReadFolderExcel(absPath)
                         self.excelDict[absPath] = curExcel
 
@@ -35,6 +58,13 @@ class DataHandler(object):
                     #     print("XLS:" + absPath)
                     # elif ext == ".xlsx":
                     #     print("XLSX:" + absPath)
+
+    def IsValidFile(self, fileName):
+        if(len(self.fileNameKeys) > 0):
+            for fileKey in self.fileNameKeys:
+                if fileKey in fileName:
+                    return True
+        return False
 
     def ReadFolderExcel(self, fPath):
         if(len(fPath) > 0):
@@ -105,6 +135,7 @@ class DataHandler(object):
         #         print("列名：", col, "列的值：", values)
         #     print("************************")
 
+        logger.info("Find Excel File Count: %d", len(self.excelDict))
         logger.info("BuildDataFrame %d", len(self.colValuesDict))
         if len(self.colValuesDict) > 0:
             df = pd.DataFrame(self.colValuesDict)
